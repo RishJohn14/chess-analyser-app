@@ -307,7 +307,7 @@ async def _run_analysis(request: AnalysisStartRequest) -> None:
             print(f"  Move {move.move_number}: played {move.played_move} eval={move.played_eval} best={move.best_move} eval={move.best_eval} loss={move.centipawn_loss}")
         print(f"... (total moves: {len(callback_payload.results)})")
 
-        # NOW write to database (atomic — only after successful analysis)
+        # NOW write to database (atomic - only after successful analysis)
         db = SessionLocal()
         try:
             # Parse PGN and create game history record with status="done"
