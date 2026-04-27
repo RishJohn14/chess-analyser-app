@@ -12,6 +12,8 @@ Endpoints:
     POST /api/analysis/callback  — receive completed analysis (called by Stockfish)
     GET  /api/analysis/status/{game_id} — check whether analysis is done (polled by frontend)
     GET  /api/analysis/result/{game_id} — retrieve stored analysis result
+
+    Extra comment to push new version
 """
 
 from __future__ import annotations
@@ -19,6 +21,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import Dict
+
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
