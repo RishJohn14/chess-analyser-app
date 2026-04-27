@@ -160,6 +160,7 @@ def analyze_game(
     results: List[MoveResult] = []
 
     for idx, (fen_before, played_move) in enumerate(positions, start=1):
+        logger.info("Current move: %d", idx)
         # Determine side to move from FEN (field index 1: "w" or "b").
         white_to_move = fen_before.split()[1] == "w"
 
