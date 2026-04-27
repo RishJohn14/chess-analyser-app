@@ -4,6 +4,7 @@ services:
   backend:
     build: ./backend
     container_name: chess-backend
+    restart: always
     ports:
       - "8000:8000"
     env_file:
@@ -16,6 +17,7 @@ services:
   frontend:
     build: ./frontend
     container_name: chess-frontend
+    restart: always
     ports:
       - "80:5173"
     volumes:
@@ -27,5 +29,6 @@ services:
   stockfish:
     build: ./stockfish
     container_name: stockfish-service
+    restart: always
     ports:
       - "8001:8001"
