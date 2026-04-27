@@ -73,8 +73,8 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     global _engine
 
     sf_path = os.getenv("STOCKFISH_PATH", "/usr/games/stockfish")
-    sf_threads = int(os.getenv("STOCKFISH_THREADS", "1"))
-    sf_hash = int(os.getenv("STOCKFISH_HASH", "32"))
+    sf_threads = int(os.getenv("STOCKFISH_THREADS", "2"))
+    sf_hash = int(os.getenv("STOCKFISH_HASH", "128"))
 
     try:
         _engine = StockfishEngine(
