@@ -147,8 +147,12 @@ def analyze_game(
     list[MoveResult]
         One entry per half-move in mainline order.
     """
+
+    logger.info("Starting analysis: depth=%s", depth)
+
     # 1. Parse PGN → list of (fen, played_move) ---------------------------------
     positions = parse_pgn(pgn_string)
+    logger.info("Parsed PGN: %d moves", len(positions))
 
     # 2. Configure depth for this request ----------------------------------------
     engine.set_depth(depth)
@@ -215,4 +219,5 @@ def analyze_game(
             idx, played_move, best_move, cpl, classification,
         )
 
+    logger.info("Analysis complete: %d moves processed", len(results))
     return results
