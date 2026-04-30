@@ -2,9 +2,9 @@ name: CICD
 
 on:
   push:
-    branches: [ main, dev, cicd, deployment, production ]
+    branches: [ production ]
   pull_request:
-    branches: [ main, dev, production ]
+    branches: [ production ]
 
 jobs:
   backend-lint-and-test:
@@ -40,7 +40,7 @@ jobs:
 
   backend-unit-tests:
     name: Backend Unit Tests
-    runs-on: ubuntu-latestQ
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -230,3 +230,5 @@ jobs:
             git pull origin production
             docker compose down
             docker compose up -d --build
+            docker ps
+            echo "Deployment completed successfully"
