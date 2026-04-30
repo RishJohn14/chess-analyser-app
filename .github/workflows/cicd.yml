@@ -222,9 +222,9 @@ jobs:
         with:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_USER }}
-          key: ${{ secrets.DOCD }}
+          key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            cd /root/chess-app-analyser
+            cd ${{ secrets.DO_APP_PATH }}
             git fetch origin
             git checkout production
             git pull origin production
