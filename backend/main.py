@@ -24,12 +24,9 @@ app = FastAPI(title="Chess Analyser", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # Vite dev server
-        "http://localhost:3000",  # Alternative dev port
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000",
-        "http://localhost:8001",
-        "http://165.22.101.80"
+        "http://165.22.101.80",   # Production frontend
+        "http://localhost:5173",  # Local Vite dev
+        "http://127.0.0.1:5173",  # Local Vite dev
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -1,20 +1,18 @@
-# Use Node image
-FROM node:20-alpine
+FROM node:20-alpine AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files first
 COPY package.json package-lock.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy rest of the app
 COPY . .
 
-# Expose Vite port
+RUN npm run build
+
+FROM nginx:alpine
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
 EXPOSE 80
 
-# Start dev server (important: allow external access)
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["nginx", "-g", "daemon off;"]
