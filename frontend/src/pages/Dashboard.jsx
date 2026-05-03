@@ -49,7 +49,7 @@ export default function Dashboard() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Chess Analyserwololo</h1>
+        <h1>Chess Analyserwolololo</h1>
         <p className="subtitle">Look up games from Chess.com by date range</p>
       </header>
 
