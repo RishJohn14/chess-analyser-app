@@ -55,8 +55,8 @@ def parse_pgn(pgn: str, user_id: int) -> GameHistoryRecord:
         black_rating=int(black_rating) if black_rating else None,
         white_accuracy=None,
         black_accuracy=None,
-        white_ACPL=None,
-        black_ACPL=None,
+        white_acpl=None,
+        black_acpl=None,
         analysis_status="pending",
         created_at=datetime.now(timezone.utc),
     )

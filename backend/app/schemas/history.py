@@ -22,8 +22,8 @@ class GameHistoryRecord(BaseModel):
         black_rating:   Optional rating of the Black player at game time.
         white_accuracy: Optional accuracy percentage for White (0-100).
         black_accuracy: Optional accuracy percentage for Black (0-100).
-        white_ACPL:     Optional average centipawn loss for White.
-        black_ACPL:     Optional average centipawn loss for Black.
+        white_acpl:     Optional average centipawn loss for White.
+        black_acpl:     Optional average centipawn loss for Black.
         analysis_status: Status of the analysis ("pending", "done", or "error").
         created_at:     Optional timestamp when the record was created.
     """
@@ -39,7 +39,7 @@ class GameHistoryRecord(BaseModel):
     black_rating: Optional[int] = Field(default=None, ge=0)
     white_accuracy: Optional[float] = Field(default=None, ge=0, le=100)
     black_accuracy: Optional[float] = Field(default=None, ge=0, le=100)
-    white_ACPL: Optional[float] = None
-    black_ACPL: Optional[float] = None
+    white_acpl: Optional[float] = None
+    black_acpl: Optional[float] = None
     analysis_status: Literal["pending", "done", "error"]
     created_at: Optional[datetime] = None
