@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose Vite port
-EXPOSE 5173
+EXPOSE 80
 
 # Start dev server (important: allow external access)
 CMD ["npm", "run", "dev", "--", "--host"]
