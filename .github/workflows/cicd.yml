@@ -231,4 +231,59 @@ jobs:
             docker compose down
             docker compose up -d --build
             docker ps
-            echo "Deployment completed successfully"
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            set -e
+  
+            echo "Checking backend health..."
+            for i in {1..20}; do
+              if curl --silent --fail http://localhost:8000/docs > /dev/null; then
+                echo "Backend is healthy."
+                exit 0
+              fi
+  
+              echo "Waiting for backend... attempt $i"
+              sleep 3
+            done
+  
+            echo "Backend health check failed."
+            exit 1
+      - name: Rollback deployment
+        if: failure()
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            set -e
+  
+            cd ${{ secrets.DO_APP_PATH }}
+  
+            echo "Rolling back to previous version..."
+  
+            PREVIOUS_COMMIT=$(cat .previous_commit)
+            echo "Previous commit: $PREVIOUS_COMMIT"
+  
+            git checkout $PREVIOUS_COMMIT
+  
+            docker compose down
+            docker compose up -d --build
+  
+            echo "Checking rollback health..."
+            for i in {1..20}; do
+              if curl --silent --fail http://localhost:8000/docs > /dev/null; then
+                echo "Rollback successful. Backend is healthy."
+                exit 0
+              fi
+  
+              echo "Waiting for rollback backend... attempt $i"
+              sleep 3
+            done
+  
+            echo "Rollback completed, but backend health check still failed."
