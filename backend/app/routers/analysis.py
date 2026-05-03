@@ -130,17 +130,57 @@ async def analysis_callback(payload: AnalysisCallbackPayload):
     
     return {"message": "Analysis callback received", "game_id": payload.game_id}
 
-
 @router.get("/status/{user_id}/{game_id:path}", response_model=AnalysisStatusResponse)
 async def analysis_status(
     user_id: int,
     game_id: str,
     db: Session = Depends(get_db),
 ):
-    count = db.query(MoveAnalysis).filter(MoveAnalysis.game_id == game_id).count()
-    if count == 0:
-        return AnalysisStatusResponse(game_id=game_id, status="pending", error=None)
-    return AnalysisStatusResponse(game_id=game_id, status="done", error=None)
+    composite_key = f"{user_id}:{game_id}"
+
+    # 1. Check in-memory store first
+    entry = _analysis_store.get(composite_key)
+
+    if entry:
+        if entry["status"] == "error":
+            return AnalysisStatusResponse(
+                game_id=game_id,
+                status="error",
+                error=entry.get("error"),
+            )
+
+        if entry["status"] == "pending":
+            return AnalysisStatusResponse(
+                game_id=game_id,
+                status="pending",
+                error=None,
+            )
+
+    # 2. Check database
+    count = db.query(MoveAnalysis).filter(
+        MoveAnalysis.user_id == user_id,
+        MoveAnalysis.game_id == game_id,
+    ).count()
+
+    logger.info(
+        "Analysis status check: user_id=%s game_id=%s move_count=%s",
+        user_id,
+        game_id,
+        count,
+    )
+
+    if count > 0:
+        return AnalysisStatusResponse(
+            game_id=game_id,
+            status="done",
+            error=None,
+        )
+
+    return AnalysisStatusResponse(
+        game_id=game_id,
+        status="pending",
+        error=None,
+    )
 
 @router.post("/status/batch")
 async def batch_analysis_status(
