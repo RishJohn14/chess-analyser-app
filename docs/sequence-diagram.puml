@@ -1,0 +1,62 @@
+@startuml
+actor User
+
+participant "Frontend\n(React / Vite)" as Frontend
+participant "Backend\n(FastAPI :8000)" as Backend
+participant "Chess.com API" as ChessAPI
+participant "Stockfish Service\n(FastAPI :8001)" as StockfishService
+database "Database\n(PostgreSQL)" as DB
+
+== Authentication ==
+
+User -> Frontend : Enter credentials
+Frontend -> Backend : POST /api/auth/login
+Backend -> DB : Verify user credentials
+DB --> Backend : User record
+Backend --> Frontend : JWT access token
+Frontend --> User : Redirect to Dashboard
+
+== Fetch Games ==
+
+User -> Frontend : Submit Chess.com username\n& date range
+Frontend -> Backend : GET /api/games?username=&start_date=&end_date=
+Backend -> ChessAPI : GET /pub/player/{username}/games/archives
+ChessAPI --> Backend : Archive URLs
+Backend -> ChessAPI : GET monthly archive URLs
+ChessAPI --> Backend : Raw game data (PGN)
+Backend -> Backend : Filter & map games by date range
+Backend --> Frontend : Game list with PGN
+Frontend --> User : Display games table
+
+== Analyse Game ==
+
+User -> Frontend : Select game to analyse
+Frontend -> Backend : POST /api/analysis/start\n{ user_id, game_id, pgn, depth }
+Backend --> Frontend : HTTP 202 Accepted
+Backend -> StockfishService : POST /analyze\n{ game_id, pgn, depth }
+
+loop For each move
+    StockfishService -> StockfishService : Evaluate position (FEN)
+end
+
+StockfishService --> Backend : AnalysisResponse\n(per-move evaluations)
+Backend -> DB : Save game_history record
+Backend -> DB : Save move_analysis records
+DB --> Backend : Confirmation
+
+== Poll for Status ==
+
+loop Until status = "done"
+    Frontend -> Backend : GET /api/analysis/status/{user_id}/{game_id}
+    Backend -> DB : Query move_analysis count
+    DB --> Backend : Record count
+    Backend --> Frontend : { status: "pending" | "done" }
+end
+
+Frontend -> Backend : GET /api/analysis/moves/{game_id}
+Backend -> DB : Fetch move_analysis records
+DB --> Backend : Move records
+Backend --> Frontend : Move-by-move analysis
+Frontend --> User : Display board & analysis dashboard
+
+@enduml
