@@ -12,6 +12,8 @@ Endpoints:
     POST /api/analysis/callback  — receive completed analysis (called by Stockfish)
     GET  /api/analysis/status/{game_id} — check whether analysis is done (polled by frontend)
     GET  /api/analysis/result/{game_id} — retrieve stored analysis result
+
+    Extra comment to push new version
 """
 
 from __future__ import annotations
@@ -20,11 +22,12 @@ import asyncio
 import logging
 from typing import Dict
 
+
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from app.models.analysis import MoveAnalysis
+from app.models.move_analysis import MoveAnalysis
 
 from app.core.database import SessionLocal, get_db
 from app.crud.analysis import create_move_analysis_record
@@ -134,6 +137,7 @@ async def analysis_status(
     game_id: str,
     db: Session = Depends(get_db),
 ):
+    from app.models.move_analysis import MoveAnalysis
     count = db.query(MoveAnalysis).filter(MoveAnalysis.game_id == game_id).count()
     if count == 0:
         return AnalysisStatusResponse(game_id=game_id, status="pending", error=None)
