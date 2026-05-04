@@ -30,11 +30,11 @@ async def get_game_analysis(
     current_user: Annotated[UserOut, Depends(get_current_user)],
     db: Session = Depends(get_db),
 ):
-    print(game_id)
+    print("placeholder A", game_id)
 
-    if game_id.startswith("https%3A/") and not game_id.startswith("https://"):
-        game_id = game_id.replace("https%3A/", "https://", 1)
-    print(game_id)
+    if game_id.startswith("https:/") and not game_id.startswith("https://"):
+        game_id = game_id.replace("https:/", "https://", 1)
+    print("placeholder A", game_id)
     """
     Fetch move-by-move analysis for a specific game.
 
