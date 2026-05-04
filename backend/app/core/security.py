@@ -4,13 +4,12 @@ Security utilities for password hashing and JWT token management.
 
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+from uuid import uuid4
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.core.config import get_settings
-
-settings = get_settings()
 
 # Password hashing context using bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -38,6 +37,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         Encoded JWT token string
     """
     to_encode = data.copy()
+    settings = get_settings()
     
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -46,7 +46,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
     
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "jti": str(uuid4())})
     encoded_jwt = jwt.encode(
         to_encode, 
         settings.SECRET_KEY, 
@@ -65,6 +65,7 @@ def decode_access_token(token: str) -> Optional[str]:
     Returns:
         The subject (email) from the token, or None if invalid
     """
+    settings = get_settings()
     try:
         payload = jwt.decode(
             token, 

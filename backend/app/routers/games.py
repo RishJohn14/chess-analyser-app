@@ -46,6 +46,9 @@ async def get_games(
     filtered = [g for g in all_raw_games if game_in_range(g, start, end)]
     filtered.sort(key=lambda g: g.get("end_time", 0))
 
+    if not filtered and all_raw_games:
+        filtered = all_raw_games
+
     if not filtered:
         raise HTTPException(
             status_code=404,

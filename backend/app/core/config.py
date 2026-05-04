@@ -25,10 +25,14 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    def __init__(self, **values):
+        values.setdefault("_env_file", None)
+        super().__init__(**values)
+
     @property
     def DATABASE_URL(self) -> str:
         # URL-encode password to handle special characters
-        encoded_password = urllib.parse.quote_plus(self.DB_PASSWORD)
+        encoded_password = urllib.parse.quote(self.DB_PASSWORD, safe="")
         return (
             f"postgresql+psycopg2://{self.DB_USER}:{encoded_password}"
             f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}?sslmode=require"
@@ -42,4 +46,4 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     """Return cached settings instance."""
-    return Settings()
+    return Settings(_env_file=".env")

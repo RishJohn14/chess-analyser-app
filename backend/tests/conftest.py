@@ -9,7 +9,6 @@ This file provides reusable fixtures for:
 - Test client for API testing
 """
 
-import os
 from typing import Generator
 from datetime import datetime, timezone
 
@@ -25,15 +24,8 @@ from app.models.user import User
 from main import app
 
 
-# Override environment variables for testing
-# Must be set BEFORE importing get_settings
-os.environ["SECRET_KEY"] = "test-secret-key-for-testing-only"
-os.environ["DB_USER"] = "test_user" 
-os.environ["DB_PASSWORD"] = "test_password"
-os.environ["DB_HOST"] = "localhost"
-os.environ["DB_NAME"] = "test_db"
-
-# Clear the lru_cache for get_settings to ensure test environment is used
+# Clear the lru_cache for get_settings to ensure each test can control
+# configuration through explicit environment patches.
 from app.core.config import get_settings
 get_settings.cache_clear()
 

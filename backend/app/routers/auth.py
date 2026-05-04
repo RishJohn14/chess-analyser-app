@@ -16,8 +16,6 @@ from app.core.security import create_access_token, decode_access_token
 from app.crud.user import authenticate_user, create_user, get_user_by_email
 from app.schemas.user import MessageResponse, Token, UserCreate, UserLogin, UserOut
 
-settings = get_settings()
-
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 # OAuth2 scheme for JWT token extraction from Authorization header
@@ -101,6 +99,7 @@ async def login(
         )
     
     # Create access token
+    settings = get_settings()
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.email},

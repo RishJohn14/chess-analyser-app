@@ -32,11 +32,13 @@ from app.models.move_analysis import MoveAnalysis
 from app.core.database import SessionLocal, get_db
 from app.crud.analysis import create_move_analysis_record
 from app.crud.history import create_game_history_record
+from app.routers.auth import get_current_user
 from app.schemas.analysis import (
     AnalysisCallbackPayload,
     AnalysisStartRequest,
     AnalysisStatusResponse,
 )
+from app.schemas.move_analysis import GameAnalysisResponse, MoveAnalysisOut
 from app.utils.history import parse_pgn
 
 logger = logging.getLogger(__name__)
@@ -226,6 +228,28 @@ async def subscribe_to_analysis(user_id: int, game_id: str):
             _event_listeners[composite_key].remove(queue)
             if not _event_listeners[composite_key]:
                 del _event_listeners[composite_key]
+
+
+@router.get("/{game_id:path}", response_model=GameAnalysisResponse)
+async def get_game_analysis(
+    game_id: str,
+    db: Session = Depends(get_db),
+    _current_user=Depends(get_current_user),
+):
+    moves = (
+        db.query(MoveAnalysis)
+        .filter(MoveAnalysis.game_id == game_id)
+        .order_by(MoveAnalysis.move_number)
+        .all()
+    )
+
+    if not moves:
+        raise HTTPException(status_code=404, detail="No analysis found for this game.")
+
+    return GameAnalysisResponse(
+        game_id=game_id,
+        moves=[MoveAnalysisOut.model_validate(move) for move in moves],
+    )
 
 
 async def _notify_listeners(composite_key: str, status: str, data: dict) -> None:
